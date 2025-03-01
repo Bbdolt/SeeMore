@@ -1,0 +1,35 @@
+{
+    "name": "SeeMore",
+    "description": "漏洞挖掘小工具，用于发现页面中的隐藏可点击元素",
+    "version": "1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "permissions": [
+        "scripting",
+        "activeTab",
+        "webNavigation"
+    ],
+    "host_permissions": ["<all_urls>"],
+    "web_accessible_resources": [{
+        "resources": ["injected/*"],
+        "matches": ["<all_urls>"]
+    }],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "images/icon16.png",
+            "32": "images/icon32.png",
+            "48": "images/icon48.png",
+            "128": "images/icon128.png"
+          }
+        },
+        "icons": {
+            "16": "images/icon16.png",
+            "32": "images/icon32.png",
+            "48": "images/icon48.png",
+            "128": "images/icon128.png"
+        }
+}

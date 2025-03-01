@@ -1,0 +1,14 @@
+*:not(html):not(body):not(head):not(script):not(style):not(meta):not(link):not(title) {
+    display: revert !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    max-width: none !important;
+    max-height: none !important;
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: auto !important;
+    pointer-events: auto !important;
+}

@@ -1,0 +1,98 @@
+<!-- <!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeeMore</title>
+    <style>
+        body {
+            width: 150px;
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, #ffaa00, #0056b3);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease-in-out;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #b300ad, #004080);
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <button id="showHidden">Show Hidden</button>
+    <script src="popup.js"></script>
+</body>
+</html> -->
+<!-- popup.html -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeeMore</title>
+    <style>
+        body {
+            width: 180px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f0f2f5;
+            gap: 10px;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .toggle-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #cf7b15, #0c6fcb);
+            color: white;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .toggle-btn.restore {
+            background: linear-gradient(135deg, #06e13d, #0865df);
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toggle-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <button id="toggleBtn" class="toggle-btn">Show Hidden</button>
+    <script src="popup.js"></script>
+</body>
+</html>
