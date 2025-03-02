@@ -1,49 +1,9 @@
-// // background.js
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//     if (message.action === "show_hidden_elements") {
-//         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-//             if (tabs.length > 0) {
-//                 // 注入所有 frame（包括 iframe）
-//                 chrome.scripting.executeScript({
-//                     target: { 
-//                         tabId: tabs[0].id,
-//                         allFrames: true  // 关键修改：处理所有 iframe
-//                     },
-//                     func: showHiddenElements
-//                 });
-//             }
-//         });
-//     }
-// });
-
-// function showHiddenElements() {
-//     // 简化的隐藏元素处理逻辑
-//     const elements = document.querySelectorAll('*');
-//     elements.forEach(el => {
-//         const style = window.getComputedStyle(el);
-//         const isHidden = style.display === "none" || el.hidden;
-        
-//         if (isHidden) {
-//             // 判断是否满足显示条件
-//             const hasClickHandler = !!el.onclick;
-//             const hasPointerCursor = style.cursor === "pointer";
-//             const hasClickableChild = el.querySelector(
-//                 'a, button, input[type="button"], input[type="submit"], [onclick]'
-//             );
-//             const hasInteractiveClass = /(btn|button|click|toggle|switch|option)/i.test(el.className);
-
-//             if (hasClickHandler || hasPointerCursor || hasClickableChild || hasInteractiveClass) {
-//                 el.style.display = "block";
-//                 el.hidden = false;
-//             }
-//         }
-//     });
-// }
-
-// background.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (!tabs.length) return;
+        if (!tabs.length) {
+            sendResponse({ success: false, error: "No active tabs found" });
+            return;
+        }
 
         const scriptConfig = {
             target: { 
@@ -54,17 +14,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         if (message.action === "show_hidden_elements") {
             scriptConfig.func = showHiddenElements;
-            chrome.scripting.executeScript(scriptConfig);
         } 
         else if (message.action === "restore_elements") {
             scriptConfig.func = restoreHiddenElements;
-            chrome.scripting.executeScript(scriptConfig);
+        } else {
+            sendResponse({ success: false, error: "Unknown action" });
+            return;
         }
+
+        chrome.scripting.executeScript(scriptConfig)
+            .then(() => sendResponse({ success: true }))
+            .catch(err => sendResponse({ success: false, error: err.message }));
+
+        return true; 
     });
+
+    return true;
 });
 
 // ... 保持之前的消息监听和脚本配置部分不变 ...
-
 function showHiddenElements() {
     const selectors = [
         '[style*="display: none"]',
@@ -127,6 +95,113 @@ function showHiddenElements() {
             /(btn|button|click|toggle|switch|option)/i.test(el.className) // class 名是否包含交互性关键词
         );
     }
+
+    // 处理注释中的隐藏内容
+    processHiddenComments();
+    function processHiddenComments() {
+        console.debug('[注释处理] 开始扫描注释节点');
+        
+        const nodeIterator = document.createNodeIterator(
+            document.documentElement,
+            NodeFilter.SHOW_COMMENT
+        );
+    
+        let commentNode;
+        let commentBlocks = [];
+        let tempBlock = [];
+    
+        while ((commentNode = nodeIterator.nextNode())) {
+            const content = commentNode.nodeValue.trim();
+    
+            console.debug(`[注释处理] 发现注释: ${content.slice(0, 50)}...`);
+    
+            if (content) {
+                tempBlock.push(commentNode);
+            } else if (tempBlock.length > 0) {
+                commentBlocks.push(tempBlock);
+                tempBlock = [];
+            }
+        }
+        if (tempBlock.length > 0) {
+            commentBlocks.push(tempBlock);
+        }
+    
+        console.debug(`[注释处理] 共发现 ${commentBlocks.length} 组注释块`);
+    
+        commentBlocks.forEach((block, index) => {
+            console.groupCollapsed(`[注释处理] 处理注释块 #${index + 1}`);
+            try {
+                let fullHTML = block.map(node => node.nodeValue).join("\n");
+                const parent = block[0].parentNode;
+                
+                if (!parent) {
+                    console.warn('[注释处理] 找不到 parentNode，跳过');
+                    return;
+                }
+                
+                console.debug('原始合并注释内容:', fullHTML);
+                const template = document.createElement('template');
+                try {
+                    template.innerHTML = cleanCommentContent(fullHTML);
+                    console.debug('解析后的HTML结构:', template.innerHTML);
+                } catch (e) {
+                    console.warn('[注释处理] HTML解析失败:', e);
+                    return;
+                }
+                
+                const interactiveElements = template.content.querySelectorAll(
+                    'a, button, input[type="button"], [onclick], [href]'
+                );
+                
+                console.debug(`发现 ${interactiveElements.length} 个可交互元素`);
+                
+                if (interactiveElements.length > 0) {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.cssText = `
+                        position: relative;
+                        z-index: 2147483647;
+                        outline: 2px dashed red;
+                        pointer-events: auto;
+                    `;
+                    wrapper.dataset.originalComment = fullHTML;
+                    wrapper.appendChild(template.content.cloneNode(true));
+                    console.debug('生成的包裹元素:', wrapper);
+                    
+                    block.forEach(node => {
+                        if (parent.contains(node)) {
+                            parent.removeChild(node);
+                        }
+                    });
+                    parent.appendChild(wrapper);
+                    activateWrapperElements(wrapper);
+                }
+            } finally {
+                console.groupEnd();
+            }
+        });
+    }
+    
+    function cleanCommentContent(content) {
+        return content.replace(/<!--\s*?/g, '').replace(/\s*?-->/g, '').trim();
+    }
+    
+    function activateWrapperElements(wrapper) {
+        console.debug('[元素激活] 处理包裹元素:', wrapper);
+        wrapper.querySelectorAll('*').forEach(el => {
+            el.style.position = 'relative';
+            el.style.zIndex = '2147483647';
+        });
+        wrapper.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('click', function(e) {
+                console.info('[点击事件] 恢复元素被点击:', this.href || this);
+                e.stopImmediatePropagation();
+            }, true);
+        });
+    }
+    
+
+    
+
 }
 
 function restoreHiddenElements() {
@@ -172,4 +247,46 @@ function restoreHiddenElements() {
             });
         }
     });
+
+    // 恢复注释内容
+    document.querySelectorAll('[data-original-comments]').forEach(wrapper => {
+        console.debug('[恢复操作] 尝试恢复注释块:', wrapper);
+    
+        if (!wrapper.dataset.originalComments) {
+            console.warn('[恢复操作] 找不到 data-original-comments，跳过');
+            return;
+        }
+    
+        let comments;
+        try {
+            comments = JSON.parse(wrapper.dataset.originalComments);
+        } catch (e) {
+            console.error('[恢复操作] JSON 解析失败:', e);
+            return;
+        }
+    
+        if (!wrapper.parentNode) {
+            console.warn('[恢复操作] wrapper 没有父节点，跳过');
+            return;
+        }
+    
+        const fragment = document.createDocumentFragment();
+        comments.forEach((text, index) => {
+            const indent = text.match(/^(\s*)/)[0] || '';
+            const comment = document.createComment(indent + text.trim());
+    
+            if (index > 0) {
+                fragment.appendChild(document.createTextNode('\n'));
+            }
+            fragment.appendChild(comment);
+        });
+    
+        try {
+            wrapper.parentNode.replaceChild(fragment, wrapper);
+            console.debug('[恢复操作] 成功恢复注释块');
+        } catch (e) {
+            console.error('[恢复操作] replaceChild 失败:', e);
+        }
+    });
+    
 }
