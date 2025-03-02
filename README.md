@@ -1,3 +1,5 @@
+![icon128](https://github.com/user-attachments/assets/41bc2008-1aa9-4023-8201-e4d44b6a7f9d)
+
 #### 初衷
 在某系统中发现导入文件功能存在注入攻击提交修复后，程序员只是将导入的元素添加"display: none;"隐藏起来了，
 但是这个功能还是存在，所以可以通过将"display: none;"删除达到显示导入功能（二次绕过）。这里在提供一思路，在第
