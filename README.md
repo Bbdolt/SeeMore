@@ -8,6 +8,8 @@
 个插件可以显示隐藏的可点击（重点）元素不会将一些无用的文本弹窗等显示出来造成页面的不美观，下面讲讲这个插件的
 应用场景以及安装方法。
 
+如果大家在使用过程中遇到了bug或一些没有成功显示的元素，可以提交到issues中，我会尽快完善匹配规则，感谢大家支持。
+
 #### V1.0教程
 1、这里以Webgoat靶场为例
 ![PixPin_2025-03-01_19-58-08](https://github.com/user-attachments/assets/afa45f56-03b9-4b30-b5f0-7fe1d6991b41)
@@ -22,6 +24,9 @@
 ![image](https://github.com/user-attachments/assets/635304b6-a334-4efa-b049-1ac89db16186)
 2、点击 Show Hidden 显示功能
 ![image](https://github.com/user-attachments/assets/04344bfc-1547-4f58-85ac-19ccb92711c8)
+
+#### v1.0.2更新
+修复部分bug（注释功能）
 
 
 
