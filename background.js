@@ -164,6 +164,12 @@ function showHiddenElements() {
                         pointer-events: auto;
                     `;
                     wrapper.dataset.originalComment = fullHTML;
+                
+                    // 新增：存储原始注释内容，便于恢复
+                    wrapper.dataset.originalComments = JSON.stringify(
+                        block.map(node => node.nodeValue)
+                    );
+                
                     wrapper.appendChild(template.content.cloneNode(true));
                     console.debug('生成的包裹元素:', wrapper);
                     
@@ -251,7 +257,7 @@ function restoreHiddenElements() {
     // 恢复注释内容
     document.querySelectorAll('[data-original-comments]').forEach(wrapper => {
         console.debug('[恢复操作] 尝试恢复注释块:', wrapper);
-    
+        
         if (!wrapper.dataset.originalComments) {
             console.warn('[恢复操作] 找不到 data-original-comments，跳过');
             return;
