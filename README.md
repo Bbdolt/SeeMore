@@ -28,6 +28,11 @@
 #### v1.0.2更新
 修复部分bug（注释功能）
 
+#### 案例补充
+发现上传功能，可以上传任意后缀但是对于大多数文件不解析，但可以解析html文件
+![image](https://github.com/user-attachments/assets/9b38fa55-b387-4b23-a8fa-6c1b1bfb5fa6)
+
+
 
 
 
