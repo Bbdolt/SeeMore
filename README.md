@@ -1,5 +1,6 @@
 ![icon128](https://github.com/user-attachments/assets/41bc2008-1aa9-4023-8201-e4d44b6a7f9d)
 
+### SeeMore
 #### 初衷
 在某系统中发现导入文件功能存在注入攻击提交修复后，程序员只是将导入的元素添加"display: none;"隐藏起来了，
 但是这个功能还是存在，所以可以通过将"display: none;"删除达到显示导入功能（二次绕过）。这里在提供一思路，在第
@@ -7,6 +8,8 @@
 进行重放攻击。但是如果每次都要去手动修改不可见元素为可见就太麻烦了还可能错过一些可利用的功能点，所以就做了这
 个插件可以显示隐藏的可点击（重点）元素不会将一些无用的文本弹窗等显示出来造成页面的不美观，下面讲讲这个插件的
 应用场景以及安装方法。
+
+如果大家在使用过程中遇到了bug或一些没有成功显示的元素，可以提交到issues中，我会尽快完善匹配规则，感谢大家支持。
 
 #### V1.0教程
 1、这里以Webgoat靶场为例
@@ -23,8 +26,16 @@
 2、点击 Show Hidden 显示功能
 ![image](https://github.com/user-attachments/assets/04344bfc-1547-4f58-85ac-19ccb92711c8)
 
+#### v1.0.2更新
+修复部分bug（注释功能）
 
+#### 案例补充
+发现上传功能，可以上传任意后缀但是对于大多数文件不解析，但可以解析html文件
+![image](https://github.com/user-attachments/assets/9b38fa55-b387-4b23-a8fa-6c1b1bfb5fa6)
 
-
-
-
+#### v1.0.3更新（添加匹配规则）
+这是某edu资产，在修改密码时直接放到了前端页面中并隐藏起来。
+![image](https://github.com/user-attachments/assets/2027c741-312d-48ad-ab83-1e672b4f2680)
+我是如何发现的？
+在修改密码时他会提示正确或错误，而且没有与服务器的任何交互我就尝试查看前端代码发现的。
+![image](https://github.com/user-attachments/assets/c1fe1db6-d34f-4d90-b89d-39cc5304a591)
