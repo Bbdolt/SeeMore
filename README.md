@@ -38,4 +38,5 @@
 ![image](https://github.com/user-attachments/assets/2027c741-312d-48ad-ab83-1e672b4f2680)
 我是如何发现的？
 在修改密码时他会提示正确或错误，而且没有与服务器的任何交互我就尝试查看前端代码发现的。
-![image](https://github.com/user-attachments/assets/c1fe1db6-d34f-4d90-b89d-39cc5304a591)
+![image](https://github.com/user-attachments/assets/7c388e5a-f842-472b-9eaf-516dbf794a35)
+
