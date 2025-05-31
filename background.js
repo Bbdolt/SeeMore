@@ -247,7 +247,7 @@ function showHiddenElements() {
       submitBtn.type = "submit";
       submitBtn.textContent = "Submit";
       submitBtn.style.marginTop = "10px";
-
+      submitBtn.setAttribute("data-auto-submit", "true"); // 添加这一行
       // 插入到表单末尾
       form.appendChild(submitBtn);
 
@@ -366,5 +366,9 @@ function restoreHiddenElements() {
     } catch (e) {
       console.error("[恢复操作] replaceChild 失败:", e);
     }
+  });
+  // 删除自动添加的 submit 按钮
+  document.querySelectorAll('button[data-auto-submit="true"]').forEach(btn => {
+    btn.remove();
   });
 }
