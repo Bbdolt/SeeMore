@@ -22,9 +22,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     chrome.scripting
-      .executeScript(scriptConfig)
-      .then(() => sendResponse({ success: true }))
-      .catch((err) => sendResponse({ success: false, error: err.message }));
+        .executeScript(scriptConfig)
+        .then(() => sendResponse({ success: true }))
+        .catch((err) => sendResponse({ success: false, error: err.message }));
 
     return true;
   });
@@ -40,6 +40,7 @@ function showHiddenElements() {
     "[hidden]",
     "iframe",
     '[class*="hidden"]',
+    '[type="hidden"]',
     '[type="hidden"][name="oldpwd"]',
     '[type="hidden"][name="password"]',
   ];
@@ -74,14 +75,14 @@ function showHiddenElements() {
   function processElement(el) {
     const style = window.getComputedStyle(el);
     const isHidden =
-      style.display === "none" || el.hidden || el.type === "hidden";
+        style.display === "none" || el.hidden || el.type === "hidden";
     if (el.className.includes("hidden") && shouldShowElement(el, style)) {
       // console.log(el.className + "===="+ el.outerHTML);
       el.className = el.dataset.originalClass
-        .split(/\s+/)
-        .filter((className) => !/hidden/i.test(className))
-        .join(" ")
-        .trim();
+          .split(/\s+/)
+          .filter((className) => !/hidden/i.test(className))
+          .join(" ")
+          .trim();
     }
 
     // if (isHidden && shouldShowElement(el, style)) {
@@ -100,15 +101,15 @@ function showHiddenElements() {
   // 保持shouldShowElement逻辑不变，但可以根据需要调整
   function shouldShowElement(el, style) {
     return (
-      !!el.onclick || // 是否有点击事件
-      style.cursor === "pointer" || // 鼠标样式为“手型”
-      el.querySelector(
-        'a, button, input[type="button"], input[type="submit"], [onclick], [href],input[name="oldpwd"],input[name="password"]'
-      ) || // 匹配所有带 href 的标签
-      /(btn|button|click|toggle|switch|option)/i.test(el.className) || // class 名是否包含交互性关键词
-      el.matches(
-        'a, button, input[type="button"], input[type="submit"], [onclick], [href],input[name="oldpwd"],input[name="password"]'
-      )
+        !!el.onclick || // 是否有点击事件
+        style.cursor === "pointer" || // 鼠标样式为“手型”
+        el.querySelector(
+            'a, button, input[type="button"], input[type="submit"], [onclick], [href],input[name="oldpwd"],input[name="password"]'
+        ) || // 匹配所有带 href 的标签
+        /(btn|button|click|toggle|switch|option)/i.test(el.className) || // class 名是否包含交互性关键词
+        el.matches(
+            'a, button, input[type="button"], input[type="submit"], [onclick], [href],input[name="oldpwd"],input[name="password"]'
+        )||el.type === "hidden"
     );
   }
 
@@ -118,8 +119,8 @@ function showHiddenElements() {
     console.debug("[注释处理] 开始扫描注释节点");
 
     const nodeIterator = document.createNodeIterator(
-      document.documentElement,
-      NodeFilter.SHOW_COMMENT
+        document.documentElement,
+        NodeFilter.SHOW_COMMENT
     );
 
     let commentNode;
@@ -166,7 +167,7 @@ function showHiddenElements() {
         }
 
         const interactiveElements = template.content.querySelectorAll(
-          'a, button, input[type="button"], [onclick], [href]'
+            'a, button, input[type="button"], [onclick], [href]'
         );
 
         console.debug(`发现 ${interactiveElements.length} 个可交互元素`);
@@ -183,7 +184,7 @@ function showHiddenElements() {
 
           // 新增：存储原始注释内容，便于恢复
           wrapper.dataset.originalComments = JSON.stringify(
-            block.map((node) => node.nodeValue)
+              block.map((node) => node.nodeValue)
           );
 
           wrapper.appendChild(template.content.cloneNode(true));
@@ -205,9 +206,9 @@ function showHiddenElements() {
 
   function cleanCommentContent(content) {
     return content
-      .replace(/<!--\s*?/g, "")
-      .replace(/\s*?-->/g, "")
-      .trim();
+        .replace(/<!--\s*?/g, "")
+        .replace(/\s*?-->/g, "")
+        .trim();
   }
 
   function activateWrapperElements(wrapper) {
@@ -218,13 +219,38 @@ function showHiddenElements() {
     });
     wrapper.querySelectorAll("a, button").forEach((el) => {
       el.addEventListener(
-        "click",
-        function (e) {
-          console.info("[点击事件] 恢复元素被点击:", this.href || this);
-          e.stopImmediatePropagation();
-        },
-        true
+          "click",
+          function (e) {
+            console.info("[点击事件] 恢复元素被点击:", this.href || this);
+            e.stopImmediatePropagation();
+          },
+          true
       );
+    });
+  }
+  //检测到form表且没有submit自动添加提交按钮
+  addMissingSubmitButtons();
+  function addMissingSubmitButtons() {
+    // 获取所有表单
+    const forms = document.querySelectorAll("form");
+    forms.forEach(form => {
+      // 检查是否已有提交按钮或提交类型的 input
+      const hasSubmitButton = form.querySelector(
+          'button[type="submit"], input[type="submit"], input[type="image"]'
+      );
+
+      if (hasSubmitButton) {
+        return; // 已有提交按钮，跳过
+      }
+      // 创建一个提交按钮
+      const submitBtn = document.createElement("button");
+      submitBtn.type = "submit";
+      submitBtn.textContent = "Submit";
+      submitBtn.style.marginTop = "10px";
+
+      // 插入到表单末尾
+      form.appendChild(submitBtn);
+
     });
   }
 }
@@ -232,7 +258,7 @@ function showHiddenElements() {
 function restoreHiddenElements() {
   // 添加class恢复选择器
   const elements = document.querySelectorAll(
-    "[data-original-display], [data-original-hidden], [data-original-class]"
+      "[data-original-display], [data-original-hidden], [data-original-class]"
   );
 
   elements.forEach((el) => {
@@ -281,23 +307,23 @@ function restoreHiddenElements() {
   document.querySelectorAll("iframe").forEach((iframe) => {
     if (iframe.contentDocument) {
       iframe.contentDocument
-        .querySelectorAll(
-          "[data-original-display], [data-original-hidden], [data-original-class]"
-        )
-        .forEach((el) => {
-          if (el.dataset.originalDisplay) {
-            el.style.display = el.dataset.originalDisplay;
-            delete el.dataset.originalDisplay;
-          }
-          if (el.dataset.originalHidden) {
-            el.hidden = el.dataset.originalHidden === "true";
-            delete el.dataset.originalHidden;
-          }
-          if (el.dataset.originalClass) {
-            el.className = el.dataset.originalClass;
-            delete el.dataset.originalClass;
-          }
-        });
+          .querySelectorAll(
+              "[data-original-display], [data-original-hidden], [data-original-class]"
+          )
+          .forEach((el) => {
+            if (el.dataset.originalDisplay) {
+              el.style.display = el.dataset.originalDisplay;
+              delete el.dataset.originalDisplay;
+            }
+            if (el.dataset.originalHidden) {
+              el.hidden = el.dataset.originalHidden === "true";
+              delete el.dataset.originalHidden;
+            }
+            if (el.dataset.originalClass) {
+              el.className = el.dataset.originalClass;
+              delete el.dataset.originalClass;
+            }
+          });
     }
   });
 
