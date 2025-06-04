@@ -40,7 +40,6 @@ function showHiddenElements() {
     "[hidden]",
     "iframe",
     '[class*="hidden"]',
-    '[type="hidden"]',
     '[type="hidden"][name="oldpwd"]',
     '[type="hidden"][name="password"]',
   ];
@@ -109,7 +108,7 @@ function showHiddenElements() {
         /(btn|button|click|toggle|switch|option)/i.test(el.className) || // class 名是否包含交互性关键词
         el.matches(
             'a, button, input[type="button"], input[type="submit"], [onclick], [href],input[name="oldpwd"],input[name="password"]'
-        )||el.type === "hidden"
+        )
     );
   }
 
